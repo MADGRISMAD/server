@@ -19,16 +19,21 @@ UniTalent es una plataforma que conecta a estudiantes universitarios con oportun
 ```
 /server
   ├── src/
-  │   ├── routes/            # Rutas de la API
+  │   ├── config/            # Conexión a base de datos y configuración
   │   ├── controllers/       # Lógica de negocio
-  │   ├── models/            # Modelos de Mongoose
-  │   ├── middlewares/       # Middlewares personalizados
-  │   ├── docs/              # Configuración de Swagger
+  │   ├── docs/              # Configuración de Swagger (OpenAPI)
+  │   ├── middlewares/       # Middlewares personalizados (auth, roles, etc.)
+  │   ├── models/            # Modelos Mongoose
+  │   ├── routes/            # Definición de rutas API
+  │   ├── services/          # Servicios auxiliares (email, pagos, etc.)
+  │   ├── utils/             # Funciones reutilizables o helpers
   │   └── app.js             # Configuración principal de Express
-  ├── index.js               # Punto de entrada (conexión DB + servidor)
-  ├── .env                   # Variables de entorno
+  ├── .env                   # Variables de entorno (no subir a git)
   ├── .gitignore
-  └── package.json
+  ├── index.js               # Entry point (conexión DB + server)
+  ├── package.json
+  ├── package-lock.json
+  └── README.md
 ```
 
 ---
