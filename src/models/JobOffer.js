@@ -18,7 +18,12 @@ const jobOfferSchema = new mongoose.Schema({
   applicants: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     coverLetter: { type: String },
-    appliedAt: { type: Date, default: Date.now }
+    appliedAt: { type: Date, default: Date.now },
+    status: {
+      type: String,
+      enum: ['applied', 'viewed', 'interview', 'hired', 'rejected'],
+      default: 'applied'
+    },
   }],
   createdAt: { type: Date, default: Date.now }
 });

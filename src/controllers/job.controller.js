@@ -1,6 +1,7 @@
 const JobOffer = require('../models/JobOffer');
+const sendNotification = require('../services/notify');
 
-// Crear nueva oferta (solo usuarios verificados)
+// Crear nueva oferta
 const createJob = async (req, res) => {
   const { title, company, description, tags, isRemote, salaryRange, duration, highlighted } = req.body;
 
@@ -29,7 +30,7 @@ const createJob = async (req, res) => {
   }
 };
 
-// Obtener lista de ofertas públicas
+// Obtener lista de ofertas
 const getJobs = async (req, res) => {
   try {
     const query = {};
@@ -39,23 +40,18 @@ const getJobs = async (req, res) => {
     if (req.query.highlighted === 'true') query.highlighted = true;
 
     const jobs = await JobOffer.find(query).sort({ createdAt: -1 });
-
     res.status(200).json(jobs);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al obtener ofertas' });
   }
-  
 };
 
+// Ver detalle de una oferta
 const getJobById = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id).populate('createdBy', 'fullName email');
-
-    if (!job) {
-      return res.status(404).json({ message: 'Oferta no encontrada' });
-    }
-
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
     res.status(200).json(job);
   } catch (error) {
     console.error(error);
@@ -63,7 +59,7 @@ const getJobById = async (req, res) => {
   }
 };
 
-
+// Actualizar una oferta
 const updateJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -73,10 +69,9 @@ const updateJob = async (req, res) => {
       return res.status(403).json({ message: 'No tienes permiso para editar esta oferta' });
     }
 
-    const updatedFields = req.body;
-    Object.assign(job, updatedFields);
-
+    Object.assign(job, req.body);
     await job.save();
+
     res.status(200).json({ message: 'Oferta actualizada', job });
   } catch (error) {
     console.error(error);
@@ -84,6 +79,7 @@ const updateJob = async (req, res) => {
   }
 };
 
+// Eliminar una oferta
 const deleteJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -101,6 +97,7 @@ const deleteJob = async (req, res) => {
   }
 };
 
+// Aplicar a una oferta
 const applyToJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -119,10 +116,20 @@ const applyToJob = async (req, res) => {
 
     job.applicants.push({
       user: req.user._id,
-      coverLetter
+      coverLetter,
+      status: 'applied'
     });
 
     await job.save();
+
+    // Notificar al empleador
+    await sendNotification({
+      recipient: job.createdBy,
+      type: 'application',
+      message: `${req.user.fullName} ha aplicado a tu oferta "${job.title}"`,
+      link: `/jobs/${job._id}`
+    });
+
     res.status(200).json({ message: 'Aplicación enviada con éxito' });
   } catch (error) {
     console.error(error);
@@ -130,6 +137,7 @@ const applyToJob = async (req, res) => {
   }
 };
 
+// Ver aplicantes
 const getApplicants = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id)
@@ -148,6 +156,41 @@ const getApplicants = async (req, res) => {
   }
 };
 
+// Cambiar estado de postulación
+const updateApplicantStatus = async (req, res) => {
+  const { jobId, applicantId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const job = await JobOffer.findById(jobId);
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+    if (job.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'No autorizado' });
+    }
+
+    const applicant = job.applicants.id(applicantId);
+    if (!applicant) return res.status(404).json({ message: 'Aplicante no encontrado' });
+
+    applicant.status = status;
+    await job.save();
+
+    // Notificación
+    await sendNotification({
+      recipient: applicant.user,
+      type: 'status',
+      message: `Tu postulación a "${job.title}" ha cambiado a estado: ${status}`,
+      link: `/jobs/${job._id}`
+    });
+
+    res.json({ message: 'Estado actualizado', applicant });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al actualizar estado' });
+  }
+};
+
+
 module.exports = {
   createJob,
   getJobs,
@@ -156,4 +199,5 @@ module.exports = {
   deleteJob,
   applyToJob,
   getApplicants,
+  updateApplicantStatus
 };
