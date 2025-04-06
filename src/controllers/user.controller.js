@@ -7,11 +7,38 @@ const generateVerificationToken = require('../utils/generateVerificationToken');
 // Registrar usuario
 const registerUser = async (req, res) => {
   try {
-    const { fullName, email, password, university } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      role = 'student',
+      university,
+      skills,
+      company
+    } = req.body;
 
+    // Verificar si ya existe el usuario
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ message: 'El usuario ya existe' });
 
+    // Validaciones por rol
+    if (role === 'student') {
+      const eduRegex = /^[^\s@]+@[^\s@]+\.edu$/;
+      if (!eduRegex.test(email)) {
+        return res.status(400).json({ message: 'Los estudiantes deben usar un correo .edu' });
+      }
+      if (!university || !skills || !Array.isArray(skills)) {
+        return res.status(400).json({ message: 'Los estudiantes deben proporcionar universidad y habilidades' });
+      }
+    }
+
+    if (role === 'employer') {
+      if (!company?.name) {
+        return res.status(400).json({ message: 'Las empresas deben proporcionar el nombre de la compañía' });
+      }
+    }
+
+    // Crear y guardar usuario
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = generateVerificationToken();
 
@@ -19,21 +46,28 @@ const registerUser = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
-      university,
+      role,
+      university: role === 'student' ? university : undefined,
+      skills: role === 'student' ? skills : undefined,
+      company: role === 'employer' ? company : undefined,
       verificationToken
     });
 
     await user.save();
 
+    // Simulación de envío de correo
     const verifyUrl = `${process.env.CLIENT_URL}/verify/${verificationToken}`;
     console.log(`🔗 Verifica tu cuenta: ${verifyUrl}`);
 
-    return res.status(201).json({ message: 'Usuario registrado. Revisa tu correo para verificar tu cuenta.' });
+    res.status(201).json({
+      message: 'Usuario registrado. Revisa tu correo para verificar tu cuenta.'
+    });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Error interno del servidor' });
+    res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
+
 
 // Login de usuario
 const loginUser = async (req, res) => {

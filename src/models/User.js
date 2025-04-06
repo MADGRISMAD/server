@@ -11,30 +11,33 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
-  university: {
-    type: String,
-  },
   password: {
     type: String,
     required: true,
   },
-  skills: [String],
   role: {
     type: String,
-    enum: ['student', 'admin'],
+    enum: ['student', 'employer', 'admin'],
     default: 'student',
   },
   verified: {
     type: Boolean,
     default: false,
   },
+  university: String,           // solo aplica a estudiantes
+  skills: [String],             // solo aplica a estudiantes
+
+  company: {                    // solo aplica a empresas
+    name: String,
+    website: String,
+    description: String,
+  },
+
+  verificationToken: String,
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  verificationToken: {
-    type: String,
-  },
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);
