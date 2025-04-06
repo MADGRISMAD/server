@@ -1,1 +1,22 @@
-/.env
+# Node modules
+node_modules/
+
+# Entornos
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Salidas
+dist/
+build/
+coverage/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db

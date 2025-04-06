@@ -132,9 +132,43 @@ const verifyEmail = async (req, res) => {
   res.status(200).json({ message: 'Correo verificado con éxito. Ya puedes iniciar sesión.' });
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    const { fullName, university, skills, company } = req.body;
+
+    // Campos comunes
+    if (fullName) user.fullName = fullName;
+
+    if (user.role === 'student') {
+      if (university) user.university = university;
+      if (skills) user.skills = skills;
+    }
+
+    if (user.role === 'employer') {
+      user.company = {
+        ...user.company,
+        ...company // ← permite actualizar campos específicos
+      };
+    }
+
+    await user.save();
+
+    res.status(200).json({ message: 'Perfil actualizado con éxito', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar perfil' });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
-  verifyEmail
+  verifyEmail,
+  updateProfile
 };

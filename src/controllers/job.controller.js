@@ -190,6 +190,29 @@ const updateApplicantStatus = async (req, res) => {
   }
 };
 
+const reportJob = async (req, res) => {
+  const { reason } = req.body;
+
+  const job = await JobOffer.findById(req.params.id);
+  if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+  const alreadyReported = job.reports.some(r => r.reportedBy.toString() === req.user._id.toString());
+  if (alreadyReported) {
+    return res.status(400).json({ message: 'Ya has reportado esta oferta' });
+  }
+
+  job.reports.push({ reportedBy: req.user._id, reason });
+
+  // 🚨 Lógica para ocultar si tiene 3 o más reportes
+  if (job.reports.length >= 3) {
+    job.isVisible = false;
+  }
+
+  await job.save();
+
+  res.status(200).json({ message: 'Oferta reportada con éxito' });
+};
+
 
 module.exports = {
   createJob,
@@ -199,5 +222,6 @@ module.exports = {
   deleteJob,
   applyToJob,
   getApplicants,
-  updateApplicantStatus
+  updateApplicantStatus,
+  reportJob,
 };
