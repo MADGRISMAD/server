@@ -15,6 +15,11 @@ const jobOfferSchema = new mongoose.Schema({
   duration: { type: String }, // Ej: "3 meses"
   highlighted: { type: Boolean, default: false },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  applicants: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    coverLetter: { type: String },
+    appliedAt: { type: Date, default: Date.now }
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 

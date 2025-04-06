@@ -101,10 +101,40 @@ const deleteJob = async (req, res) => {
   }
 };
 
+const applyToJob = async (req, res) => {
+  try {
+    const job = await JobOffer.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+    if (!req.user.verified) {
+      return res.status(403).json({ message: 'Solo usuarios verificados pueden aplicar' });
+    }
+
+    const alreadyApplied = job.applicants.some(app => app.user.toString() === req.user._id.toString());
+    if (alreadyApplied) {
+      return res.status(400).json({ message: 'Ya has aplicado a esta oferta' });
+    }
+
+    const { coverLetter } = req.body;
+
+    job.applicants.push({
+      user: req.user._id,
+      coverLetter
+    });
+
+    await job.save();
+    res.status(200).json({ message: 'Aplicación enviada con éxito' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al aplicar a la oferta' });
+  }
+};
+
 module.exports = {
   createJob,
   getJobs,
   getJobById,
   updateJob,
-  deleteJob
+  deleteJob,
+  applyToJob
 };
