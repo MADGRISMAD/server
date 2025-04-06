@@ -64,8 +64,47 @@ const getJobById = async (req, res) => {
 };
 
 
+const updateJob = async (req, res) => {
+  try {
+    const job = await JobOffer.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+    if (job.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'No tienes permiso para editar esta oferta' });
+    }
+
+    const updatedFields = req.body;
+    Object.assign(job, updatedFields);
+
+    await job.save();
+    res.status(200).json({ message: 'Oferta actualizada', job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar la oferta' });
+  }
+};
+
+const deleteJob = async (req, res) => {
+  try {
+    const job = await JobOffer.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+    if (job.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'No tienes permiso para eliminar esta oferta' });
+    }
+
+    await job.deleteOne();
+    res.status(200).json({ message: 'Oferta eliminada con éxito' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al eliminar la oferta' });
+  }
+};
+
 module.exports = {
   createJob,
   getJobs,
   getJobById,
+  updateJob,
+  deleteJob
 };
