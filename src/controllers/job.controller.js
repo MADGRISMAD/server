@@ -130,11 +130,30 @@ const applyToJob = async (req, res) => {
   }
 };
 
+const getApplicants = async (req, res) => {
+  try {
+    const job = await JobOffer.findById(req.params.id)
+      .populate('applicants.user', 'fullName email university skills');
+
+    if (!job) return res.status(404).json({ message: 'Oferta no encontrada' });
+
+    if (job.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'No tienes permiso para ver los aplicantes' });
+    }
+
+    res.status(200).json(job.applicants);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener aplicantes' });
+  }
+};
+
 module.exports = {
   createJob,
   getJobs,
   getJobById,
   updateJob,
   deleteJob,
-  applyToJob
+  applyToJob,
+  getApplicants,
 };
