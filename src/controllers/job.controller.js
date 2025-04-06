@@ -45,9 +45,27 @@ const getJobs = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Error al obtener ofertas' });
   }
+  
 };
+
+const getJobById = async (req, res) => {
+  try {
+    const job = await JobOffer.findById(req.params.id).populate('createdBy', 'fullName email');
+
+    if (!job) {
+      return res.status(404).json({ message: 'Oferta no encontrada' });
+    }
+
+    res.status(200).json(job);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener la oferta' });
+  }
+};
+
 
 module.exports = {
   createJob,
   getJobs,
+  getJobById,
 };
