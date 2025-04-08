@@ -3,7 +3,8 @@ const sendNotification = require('../services/notify');
 
 // Crear nueva oferta
 const createJob = async (req, res) => {
-  const { title, company, description, tags, isRemote, salaryRange, duration, highlighted } = req.body;
+  const { title, description, tags, isRemote, salaryRange, duration, highlighted } = req.body;
+
 
   if (!req.user.verified) {
     return res.status(403).json({ message: 'Debes verificar tu correo .edu para publicar trabajos.' });
@@ -12,14 +13,14 @@ const createJob = async (req, res) => {
   try {
     const job = new JobOffer({
       title,
-      company,
+      company: req.user.company?.name || 'Empresa desconocida', // ✅ aquí se arregla
       description,
       tags,
       isRemote,
       salaryRange,
       duration,
       highlighted,
-      createdBy: req.user._id,
+      createdBy: req.user._id
     });
 
     await job.save();
