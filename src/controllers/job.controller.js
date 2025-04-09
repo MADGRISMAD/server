@@ -1,10 +1,9 @@
 const JobOffer = require('../models/JobOffer');
 const sendNotification = require('../services/notify');
 
-// Crear nueva oferta
+// Crear oferta
 const createJob = async (req, res) => {
   const { title, description, tags, isRemote, salaryRange, duration, highlighted } = req.body;
-
 
   if (!req.user.verified) {
     return res.status(403).json({ message: 'Debes verificar tu correo .edu para publicar trabajos.' });
@@ -13,7 +12,7 @@ const createJob = async (req, res) => {
   try {
     const job = new JobOffer({
       title,
-      company: req.user.company?.name || 'Empresa desconocida', // ✅ aquí se arregla
+      company: req.user.company?.name || 'Empresa desconocida',
       description,
       tags,
       isRemote,
@@ -31,10 +30,10 @@ const createJob = async (req, res) => {
   }
 };
 
-// Obtener lista de ofertas
+// Obtener trabajos visibles con filtros
 const getJobs = async (req, res) => {
   try {
-    const query = {};
+    const query = { isVisible: true };
 
     if (req.query.remote === 'true') query.isRemote = true;
     if (req.query.tag) query.tags = { $in: [req.query.tag] };
@@ -48,7 +47,29 @@ const getJobs = async (req, res) => {
   }
 };
 
-// Ver detalle de una oferta
+// Ver trabajos creados por una empresa
+const getJobsByCreator = async (req, res) => {
+  try {
+    const jobs = await JobOffer.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(jobs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al obtener tus ofertas' });
+  }
+};
+
+// Ver trabajos a los que aplicó el estudiante
+const getJobsByApplicant = async (req, res) => {
+  try {
+    const jobs = await JobOffer.find({ 'applicants.user': req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(jobs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al obtener tus aplicaciones' });
+  }
+};
+
+// Obtener una oferta
 const getJobById = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id).populate('createdBy', 'fullName email');
@@ -60,7 +81,7 @@ const getJobById = async (req, res) => {
   }
 };
 
-// Actualizar una oferta
+// Actualizar oferta
 const updateJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -80,7 +101,7 @@ const updateJob = async (req, res) => {
   }
 };
 
-// Eliminar una oferta
+// Eliminar oferta
 const deleteJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -98,7 +119,7 @@ const deleteJob = async (req, res) => {
   }
 };
 
-// Aplicar a una oferta
+// Aplicar a oferta
 const applyToJob = async (req, res) => {
   try {
     const job = await JobOffer.findById(req.params.id);
@@ -123,7 +144,6 @@ const applyToJob = async (req, res) => {
 
     await job.save();
 
-    // Notificar al empleador
     await sendNotification({
       recipient: job.createdBy,
       type: 'application',
@@ -176,7 +196,6 @@ const updateApplicantStatus = async (req, res) => {
     applicant.status = status;
     await job.save();
 
-    // Notificación
     await sendNotification({
       recipient: applicant.user,
       type: 'status',
@@ -191,6 +210,7 @@ const updateApplicantStatus = async (req, res) => {
   }
 };
 
+// Reportar oferta
 const reportJob = async (req, res) => {
   const { reason } = req.body;
 
@@ -204,7 +224,6 @@ const reportJob = async (req, res) => {
 
   job.reports.push({ reportedBy: req.user._id, reason });
 
-  // 🚨 Lógica para ocultar si tiene 3 o más reportes
   if (job.reports.length >= 3) {
     job.isVisible = false;
   }
@@ -213,7 +232,6 @@ const reportJob = async (req, res) => {
 
   res.status(200).json({ message: 'Oferta reportada con éxito' });
 };
-
 
 module.exports = {
   createJob,
@@ -225,4 +243,6 @@ module.exports = {
   getApplicants,
   updateApplicantStatus,
   reportJob,
+  getJobsByCreator,
+  getJobsByApplicant
 };

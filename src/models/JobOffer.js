@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const jobOfferSchema = new mongoose.Schema({
   title: { type: String, required: true },
   company: { type: String, required: true },
+  companyLogo: { type: String }, // <- opcional
   description: { type: String, required: true },
   tags: [String],
   isRemote: { type: Boolean, default: false },
@@ -14,10 +15,20 @@ const jobOfferSchema = new mongoose.Schema({
   },
   duration: { type: String }, // Ej: "3 meses"
   highlighted: { type: Boolean, default: false },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    index: true, // 🧠 mejora búsquedas por empresa
+  },
+
   applicants: [
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        index: true, // 🧠 mejora búsquedas por postulante
+      },
       coverLetter: { type: String },
       appliedAt: { type: Date, default: Date.now },
       status: {
@@ -27,7 +38,9 @@ const jobOfferSchema = new mongoose.Schema({
       },
     },
   ],
+
   createdAt: { type: Date, default: Date.now },
+
   reports: [
     {
       reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -35,10 +48,8 @@ const jobOfferSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now },
     },
   ],
-  isVisible: {
-    type: Boolean,
-    default: true
-  }
+
+  isVisible: { type: Boolean, default: true },
 });
 
 module.exports = mongoose.model("JobOffer", jobOfferSchema);
