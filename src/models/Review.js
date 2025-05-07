@@ -28,41 +28,54 @@ const reviewSchema = new mongoose.Schema({
     trim: true,
     maxlength: 1000
   },
-  categories: {
-    professionalism: {
-      type: Number,
-      min: 1,
-      max: 5
+  categories: [{
+    name: {
+      type: String,
+      required: true
     },
-    communication: {
+    rating: {
       type: Number,
-      min: 1,
-      max: 5
-    },
-    punctuality: {
-      type: Number,
-      min: 1,
-      max: 5
-    },
-    skills: {
-      type: Number,
+      required: true,
       min: 1,
       max: 5
     }
+  }],
+  universityRating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5
   },
-  isVerified: {
-    type: Boolean,
-    default: false
+  careerRating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5
+  },
+  pointsAwarded: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 20
+  },
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending'
   },
   createdAt: {
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
-// Índices para mejorar el rendimiento de las búsquedas
-reviewSchema.index({ reviewer: 1, reviewed: 1, job: 1 }, { unique: true });
-reviewSchema.index({ reviewed: 1 });
+// Índices para mejorar el rendimiento de búsqueda
+reviewSchema.index({ reviewer: 1, reviewed: 1 });
 reviewSchema.index({ job: 1 });
+reviewSchema.index({ verificationStatus: 1 });
 
-module.exports = mongoose.model('Review', reviewSchema); 
+const Review = mongoose.model('Review', reviewSchema);
+
+module.exports = Review; 

@@ -12,6 +12,8 @@ const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const recommendationRoutes = require('./routes/recommendation.routes');
 const messageRoutes = require('./routes/message.routes');
+const portfolioRoutes = require('./routes/portfolio.routes');
+const pointsRoutes = require('./routes/points.routes');
 
 // Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -64,6 +66,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/points', pointsRoutes);
 
 // Swagger docs
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

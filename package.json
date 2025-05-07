@@ -26,7 +26,12 @@
     "mongoose": "^8.13.2",
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "pdfkit": "^0.14.0",
+    "multer": "^1.4.5-lts.1",
+    "cloudinary": "^2.0.1",
+    "handlebars": "^4.7.8",
+    "html-pdf-node": "^1.0.8"
   },
   "devDependencies": {
     "@sentry/node": "^9.15.0",
