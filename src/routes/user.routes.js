@@ -31,15 +31,122 @@ const protect = require('../middlewares/auth');
  *                 type: string
  *               password:
  *                 type: string
- *               university:
- *                 type: string
  *               role:
  *                 type: string
  *                 enum: [student, employer]
+ *               # Campos específicos para estudiantes
+ *               university:
+ *                 type: string
+ *               major:
+ *                 type: string
+ *               graduationYear:
+ *                 type: number
+ *               currentSemester:
+ *                 type: number
+ *               gpa:
+ *                 type: number
  *               skills:
  *                 type: array
  *                 items:
  *                   type: string
+ *               languages:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     language:
+ *                       type: string
+ *                     level:
+ *                       type: string
+ *                       enum: [básico, intermedio, avanzado, nativo]
+ *               experience:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     company:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                     isCurrent:
+ *                       type: boolean
+ *               projects:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     technologies:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     url:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *               certifications:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     issuer:
+ *                       type: string
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     url:
+ *                       type: string
+ *               socialLinks:
+ *                 type: object
+ *                 properties:
+ *                   linkedin:
+ *                     type: string
+ *                   github:
+ *                     type: string
+ *                   portfolio:
+ *                     type: string
+ *               bio:
+ *                 type: string
+ *               location:
+ *                 type: object
+ *                 properties:
+ *                   city:
+ *                     type: string
+ *                   country:
+ *                     type: string
+ *                   isRemote:
+ *                     type: boolean
+ *               availability:
+ *                 type: string
+ *                 enum: [full-time, part-time, internship, project-based]
+ *               preferredSalary:
+ *                 type: object
+ *                 properties:
+ *                   min:
+ *                     type: number
+ *                   max:
+ *                     type: number
+ *                   currency:
+ *                     type: string
+ *                     default: USD
+ *               # Campos específicos para empresas
  *               company:
  *                 type: object
  *                 properties:
@@ -138,12 +245,119 @@ router.get('/verify/:token', verifyEmail);
  *             properties:
  *               fullName:
  *                 type: string
+ *               # Campos específicos para estudiantes
  *               university:
  *                 type: string
+ *               major:
+ *                 type: string
+ *               graduationYear:
+ *                 type: number
+ *               currentSemester:
+ *                 type: number
+ *               gpa:
+ *                 type: number
  *               skills:
  *                 type: array
  *                 items:
  *                   type: string
+ *               languages:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     language:
+ *                       type: string
+ *                     level:
+ *                       type: string
+ *                       enum: [básico, intermedio, avanzado, nativo]
+ *               experience:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     company:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                     isCurrent:
+ *                       type: boolean
+ *               projects:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     technologies:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     url:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *               certifications:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     issuer:
+ *                       type: string
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     url:
+ *                       type: string
+ *               socialLinks:
+ *                 type: object
+ *                 properties:
+ *                   linkedin:
+ *                     type: string
+ *                   github:
+ *                     type: string
+ *                   portfolio:
+ *                     type: string
+ *               bio:
+ *                 type: string
+ *               location:
+ *                 type: object
+ *                 properties:
+ *                   city:
+ *                     type: string
+ *                   country:
+ *                     type: string
+ *                   isRemote:
+ *                     type: boolean
+ *               availability:
+ *                 type: string
+ *                 enum: [full-time, part-time, internship, project-based]
+ *               preferredSalary:
+ *                 type: object
+ *                 properties:
+ *                   min:
+ *                     type: number
+ *                   max:
+ *                     type: number
+ *                   currency:
+ *                     type: string
+ *                     default: USD
+ *               # Campos específicos para empresas
  *               company:
  *                 type: object
  *                 properties:
@@ -160,7 +374,6 @@ router.get('/verify/:token', verifyEmail);
  *         description: No autorizado
  */
 router.put('/me', protect, updateProfile);
-
 
 module.exports = router;
 

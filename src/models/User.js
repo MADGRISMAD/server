@@ -25,7 +25,64 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   university: String,           // solo aplica a estudiantes
+  major: String,                    // Carrera o especialización
+  graduationYear: Number,           // Año de graduación esperado
+  currentSemester: Number,          // Semestre actual
+  gpa: Number,                      // Promedio académico
   skills: [String],             // solo aplica a estudiantes
+  languages: [{                     // Idiomas que domina
+    language: String,
+    level: {
+      type: String,
+      enum: ['básico', 'intermedio', 'avanzado', 'nativo']
+    }
+  }],
+  experience: [{                    // Experiencia laboral/voluntariado
+    title: String,
+    company: String,
+    description: String,
+    startDate: Date,
+    endDate: Date,
+    isCurrent: Boolean
+  }],
+  projects: [{                      // Proyectos personales o académicos
+    name: String,
+    description: String,
+    technologies: [String],
+    url: String,
+    startDate: Date,
+    endDate: Date
+  }],
+  certifications: [{                // Certificaciones
+    name: String,
+    issuer: String,
+    date: Date,
+    url: String
+  }],
+  socialLinks: {                    // Enlaces a perfiles profesionales
+    linkedin: String,
+    github: String,
+    portfolio: String
+  },
+  bio: String,                      // Biografía o resumen profesional
+  location: {                       // Ubicación
+    city: String,
+    country: String,
+    isRemote: Boolean
+  },
+  availability: {                   // Disponibilidad
+    type: String,
+    enum: ['full-time', 'part-time', 'internship', 'project-based'],
+    default: 'full-time'
+  },
+  preferredSalary: {                // Expectativa salarial
+    min: Number,
+    max: Number,
+    currency: {
+      type: String,
+      default: 'USD'
+    }
+  },
 
   company: {                    // solo aplica a empresas
     name: String,

@@ -13,7 +13,20 @@ const registerUser = async (req, res) => {
       password,
       role = 'student',
       university,
+      major,
+      graduationYear,
+      currentSemester,
+      gpa,
       skills,
+      languages,
+      experience,
+      projects,
+      certifications,
+      socialLinks,
+      bio,
+      location,
+      availability,
+      preferredSalary,
       company
     } = req.body;
 
@@ -47,8 +60,23 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      // Campos específicos para estudiantes
       university: role === 'student' ? university : undefined,
+      major: role === 'student' ? major : undefined,
+      graduationYear: role === 'student' ? graduationYear : undefined,
+      currentSemester: role === 'student' ? currentSemester : undefined,
+      gpa: role === 'student' ? gpa : undefined,
       skills: role === 'student' ? skills : undefined,
+      languages: role === 'student' ? languages : undefined,
+      experience: role === 'student' ? experience : undefined,
+      projects: role === 'student' ? projects : undefined,
+      certifications: role === 'student' ? certifications : undefined,
+      socialLinks: role === 'student' ? socialLinks : undefined,
+      bio: role === 'student' ? bio : undefined,
+      location: role === 'student' ? location : undefined,
+      availability: role === 'student' ? availability : undefined,
+      preferredSalary: role === 'student' ? preferredSalary : undefined,
+      // Campos específicos para empresas
       company: role === 'employer' ? company : undefined,
       verificationToken
     });
@@ -138,20 +166,52 @@ const updateProfile = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const { fullName, university, skills, company } = req.body;
+    const {
+      fullName,
+      university,
+      major,
+      graduationYear,
+      currentSemester,
+      gpa,
+      skills,
+      languages,
+      experience,
+      projects,
+      certifications,
+      socialLinks,
+      bio,
+      location,
+      availability,
+      preferredSalary,
+      company
+    } = req.body;
 
     // Campos comunes
     if (fullName) user.fullName = fullName;
 
     if (user.role === 'student') {
+      // Actualizar campos específicos de estudiante
       if (university) user.university = university;
+      if (major) user.major = major;
+      if (graduationYear) user.graduationYear = graduationYear;
+      if (currentSemester) user.currentSemester = currentSemester;
+      if (gpa) user.gpa = gpa;
       if (skills) user.skills = skills;
+      if (languages) user.languages = languages;
+      if (experience) user.experience = experience;
+      if (projects) user.projects = projects;
+      if (certifications) user.certifications = certifications;
+      if (socialLinks) user.socialLinks = socialLinks;
+      if (bio) user.bio = bio;
+      if (location) user.location = location;
+      if (availability) user.availability = availability;
+      if (preferredSalary) user.preferredSalary = preferredSalary;
     }
 
     if (user.role === 'employer') {
       user.company = {
         ...user.company,
-        ...company // ← permite actualizar campos específicos
+        ...company
       };
     }
 

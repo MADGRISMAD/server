@@ -144,12 +144,13 @@ const applyToJob = async (req, res) => {
 
     await job.save();
 
+    const io = req.app.get('io');
     await sendNotification({
       recipient: job.createdBy,
       type: 'application',
       message: `${req.user.fullName} ha aplicado a tu oferta "${job.title}"`,
       link: `/jobs/${job._id}`
-    });
+    }, io);
 
     res.status(200).json({ message: 'Aplicación enviada con éxito' });
   } catch (error) {
@@ -196,12 +197,13 @@ const updateApplicantStatus = async (req, res) => {
     applicant.status = status;
     await job.save();
 
+    const io = req.app.get('io');
     await sendNotification({
       recipient: applicant.user,
       type: 'status',
       message: `Tu postulación a "${job.title}" ha cambiado a estado: ${status}`,
       link: `/jobs/${job._id}`
-    });
+    }, io);
 
     res.json({ message: 'Estado actualizado', applicant });
   } catch (err) {
