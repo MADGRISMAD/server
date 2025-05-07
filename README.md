@@ -11,6 +11,9 @@ UniTalent es una plataforma que conecta a estudiantes universitarios con oportun
 - **Autenticación**: JWT
 - **Documentación**: Swagger (OpenAPI 3.x)
 - **ORM**: Mongoose
+- **Monitoreo**: Sentry
+- **Almacenamiento**: Cloudinary
+- **Comunicación en tiempo real**: Socket.IO
 
 ---
 
@@ -61,6 +64,11 @@ Crea un archivo `.env` basado en `.env.example`:
 MONGO_URI=mongodb://localhost:27017/unitalent
 JWT_SECRET=supersecretkey
 PORT=5000
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+SENTRY_DSN=tu_sentry_dsn
+CLIENT_URL=http://localhost:3000
 ```
 
 ---
@@ -89,17 +97,48 @@ http://localhost:5000/api/docs
 
 ---
 
-## ✅ Funcionalidades MVP
+## ✅ Funcionalidades Implementadas
 
+### Sistema de Usuarios
 - Registro con email `.edu` (estudiantes)
 - Registro de empresas (sin restricción de email)
 - Inicio de sesión
+- Validación de roles (`student`, `employer`, `admin`)
+- Perfiles profesionales con portafolio
+- Generación de CV en PDF
+
+### Sistema de Trabajos
 - Creación y búsqueda de ofertas laborales
 - Postulaciones
-- Centro de notificaciones
-- Panel de administración
+- Sistema de pujas con puntos
+- Ranking de postulantes
 - Reporte de ofertas sospechosas
-- Validación de roles (`student`, `employer`, `admin`)
+
+### Sistema de Puntos y Reseñas
+- Reseñas por trabajo completado
+- Calificaciones universitarias
+- Calificaciones de carrera
+- Sistema de puntos ganados
+- Subastas con puntos
+- Historial de transacciones
+
+### Comunicación
+- Centro de notificaciones en tiempo real
+- Sistema de mensajería
+- Notificaciones por email
+
+### Administración
+- Panel de administración
+- Gestión de usuarios
+- Gestión de ofertas
+- Reportes y estadísticas
+
+### Seguridad
+- Autenticación con JWT
+- Validación de roles por middleware
+- Protección de rutas por token
+- Manejo de errores centralizado
+- Monitoreo con Sentry
 
 ---
 
@@ -108,6 +147,10 @@ http://localhost:5000/api/docs
 - Autenticación con JWT
 - Validación de roles por middleware
 - Protección de rutas por token
+- Manejo de errores centralizado
+- Monitoreo con Sentry
+- Validación de datos
+- Sanitización de inputs
 
 ---
 
